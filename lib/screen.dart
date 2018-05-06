@@ -11,14 +11,15 @@ class ScreenScaffold extends StatefulWidget {
   _ScreenScaffold createState() => new _ScreenScaffold();
 }
 
-class _ScreenScaffold extends State<ScreenScaffold> {
+class _ScreenScaffold extends State<ScreenScaffold> with TickerProviderStateMixin {
   MenuController menuController;
 
   @override
   void initState() {
     super.initState();
 
-    menuController = new MenuController()..addListener(() => setState((){}));
+    menuController = new MenuController(vsync: this)
+      ..addListener(() => setState((){}));
   }
 
   @override
@@ -120,21 +121,58 @@ class Screen {
 }
 
 class MenuController extends ChangeNotifier {
+
+  final TickerProvider vsync;
+  final AnimationController _animationController;
+
   MenuState state = MenuState.closed;
-  double percentOpen = 0.0;
+
+  MenuController({
+    this.vsync
+  }) : _animationController = new AnimationController(vsync: vsync){
+
+    _animationController
+      ..duration = const Duration( milliseconds: 250)
+      ..addListener((){ notifyListeners();})
+      ..addStatusListener((AnimationStatus status){
+      switch (status){
+        case AnimationStatus.forward:
+          state = MenuState.opening;
+          break;
+
+        case AnimationStatus.reverse:
+          state = MenuState.closing;
+          break;
+
+        case AnimationStatus.completed:
+          state = MenuState.open;
+          break;
+
+        case AnimationStatus.dismissed:
+          state = MenuState.closed;
+          break;
+      }
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose(){
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  // 0 and 1 
+  get percentOpen{
+    return _animationController.value;
+  }
 
   open() {
-    state = MenuState.open;
-    percentOpen = 1.0;
-
-    notifyListeners();
+   _animationController.forward();
   }
 
   close() {
-    state = MenuState.closed;
-    percentOpen = 0.0;
-
-    notifyListeners();
+   _animationController.reverse();
   }
 
   toggle() {
