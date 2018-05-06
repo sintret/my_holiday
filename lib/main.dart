@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return new ScreenScaffold(contentScreen: activeState);
+    return new ScreenScaffold(menuScreen: new MenuScreen(),contentScreen: activeState);
   }
 }
 

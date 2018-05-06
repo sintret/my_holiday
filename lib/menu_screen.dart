@@ -12,32 +12,39 @@ class _MenuScreen extends State<MenuScreen>{
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: new BoxDecoration(
-          image: new DecorationImage(
-              image: new AssetImage('images/black_bc.jpg'),
-              fit: BoxFit.cover)
-      ),
-      child: new Material(
-        color: Colors.transparent,
-        child: new Stack(
-          children: [createMenuTitle(),createMenuItems()],
-        ),
-      ),
+    return new ScreenScaffoldMenuController(
+      builder: (BuildContext context, MenuController menuController){
+        return  new Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: new BoxDecoration(
+              image: new DecorationImage(
+                  image: new AssetImage('images/black_bc.jpg'),
+                  fit: BoxFit.cover)
+          ),
+          child: new Material(
+            color: Colors.transparent,
+            child: new Stack(
+              children: [
+                createMenuTitle(),
+                createMenuItems(menuController)
+              ],
+            ),
+          ),
+        );
+      }
     );
 
   }
-  createMenuItems() {
+  createMenuItems(MenuController menuController) {
     return new Transform(
-      transform: new Matrix4.translationValues(0.0, 230.0, 0.0),
+      transform: new Matrix4.translationValues(0.0, 250.0, 0.0),
       child: new Column(
           children: [
-            new _MenuListItems(title:'HOME', isSelected: true),
-            new _MenuListItems(title:'PROFILE', isSelected: false),
-            new _MenuListItems(title:'ABOUT', isSelected: false),
-            new _MenuListItems(title:'SETTING', isSelected: false),
+            new _MenuListItems(title:'HOME', isSelected: true, onTap: (){ menuController.close();}),
+            new _MenuListItems(title:'PROFILE', isSelected: false, onTap: (){ menuController.close();}),
+            new _MenuListItems(title:'ABOUT', isSelected: false, onTap: (){ menuController.close();}),
+            new _MenuListItems(title:'SETTING', isSelected: false, onTap: (){ menuController.close();}),
 
           ]),
     ) ;
@@ -69,16 +76,15 @@ class _MenuListItems extends StatelessWidget{
 
   final String title;
   final bool isSelected;
+  final Function onTap;
 
-  _MenuListItems({this.title,this.isSelected});
+  _MenuListItems({this.title,this.isSelected, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return new InkWell(
       splashColor: const Color(0x44000000),
-      onTap: isSelected ? null: () {
-        // TODO :
-      },
+      onTap: isSelected ? null: onTap,
       child: new Container(
         width: double.infinity,
         child: new Padding(
