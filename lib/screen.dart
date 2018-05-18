@@ -8,18 +8,24 @@ class ScreenScaffold extends StatefulWidget {
   ScreenScaffold({this.menuScreen, this.contentScreen});
 
   @override
-  _ScreenScaffold createState() => new _ScreenScaffold();
+  _ScreenScaffoldState createState() => new _ScreenScaffoldState();
 }
 
-class _ScreenScaffold extends State<ScreenScaffold> with TickerProviderStateMixin {
+class _ScreenScaffoldState extends State<ScreenScaffold>
+    with TickerProviderStateMixin {
   MenuController menuController;
+
+  Curve scaleDownCurve = new Interval(0.0, 0.3, curve: Curves.easeOut);
+  Curve scaleUpCurve = new Interval(0.0, 0.1, curve: Curves.easeOut);
+  Curve slideOutCurve = new Interval(0.0, 0.1, curve: Curves.easeOut);
+  Curve slideInCurve = new Interval(0.0, 0.1, curve: Curves.easeOut);
 
   @override
   void initState() {
     super.initState();
 
     menuController = new MenuController(vsync: this)
-      ..addListener(() => setState((){}));
+      ..addListener(() => setState(() {}));
   }
 
   @override
@@ -53,8 +59,29 @@ class _ScreenScaffold extends State<ScreenScaffold> with TickerProviderStateMixi
   }
 
   zoomAndSlideContent(Widget content) {
-    final slideAmount = 235.0 * (menuController.percentOpen);
-    final contentScale = 1.0 - (0.2 * menuController.percentOpen);
+    var slidePercent, scalePercent;
+
+    switch (menuController.state) {
+      case MenuState.closed:
+        slidePercent = 0.0;
+        scalePercent = 0.0;
+        break;
+      case MenuState.open:
+        slidePercent = 1.0;
+        scalePercent = 1.0;
+        break;
+      case MenuState.opening:
+        slidePercent = slideOutCurve.transform(menuController.percentOpen);
+        scalePercent = scaleDownCurve.transform(menuController.percentOpen);
+        break;
+      case MenuState.closing:
+        slidePercent = slideInCurve.transform(menuController.percentOpen);
+        scalePercent = scaleUpCurve.transform(menuController.percentOpen);
+        break;
+    }
+
+    final slideAmount = 235.0 * slidePercent;
+    final contentScale = 1.0 - (0.2 * scalePercent);
     final cornerRadius = 10.0 * menuController.percentOpen;
 
     return new Transform(
@@ -86,31 +113,27 @@ class _ScreenScaffold extends State<ScreenScaffold> with TickerProviderStateMixi
   }
 }
 
-
 class ScreenScaffoldMenuController extends StatelessWidget {
-
   final ScreenScaffoldBuilder builder;
 
-  ScreenScaffoldMenuController({
-    this.builder
-  });
-  
+  ScreenScaffoldMenuController({this.builder});
+
   @override
   Widget build(BuildContext context) {
     return builder(context, getMenuController(context));
   }
 
   MenuController getMenuController(BuildContext context) {
-
-    final ScreenScaffold = context.ancestorStateOfType(
-        new TypeMatcher<_ScreenScaffold>()
-    ) as _ScreenScaffold;
+    final ScreenScaffold =
+        context.ancestorStateOfType(new TypeMatcher<_ScreenScaffoldState>())
+            as _ScreenScaffoldState;
 
     return ScreenScaffold.menuController;
   }
 }
 
-typedef ScreenScaffoldBuilder(BuildContext context, MenuController menuController);
+typedef ScreenScaffoldBuilder(
+    BuildContext context, MenuController menuController);
 
 class Screen {
   final String title;
@@ -121,64 +144,63 @@ class Screen {
 }
 
 class MenuController extends ChangeNotifier {
-
   final TickerProvider vsync;
   final AnimationController _animationController;
 
   MenuState state = MenuState.closed;
 
-  MenuController({
-    this.vsync
-  }) : _animationController = new AnimationController(vsync: vsync){
-
+  MenuController({this.vsync})
+      : _animationController = new AnimationController(vsync: vsync) {
     _animationController
-      ..duration = const Duration( milliseconds: 250)
-      ..addListener((){ notifyListeners();})
-      ..addStatusListener((AnimationStatus status){
-      switch (status){
-        case AnimationStatus.forward:
-          state = MenuState.opening;
-          break;
+      ..duration = const Duration(milliseconds: 250)
+      ..addListener(() {
+        notifyListeners();
+      })
+      ..addStatusListener((AnimationStatus status) {
+        switch (status) {
+          case AnimationStatus.forward:
+            state = MenuState.opening;
+            break;
 
-        case AnimationStatus.reverse:
-          state = MenuState.closing;
-          break;
+          case AnimationStatus.reverse:
+            state = MenuState.closing;
+            break;
 
-        case AnimationStatus.completed:
-          state = MenuState.open;
-          break;
+          case AnimationStatus.completed:
+            state = MenuState.open;
+            break;
 
-        case AnimationStatus.dismissed:
-          state = MenuState.closed;
-          break;
-      }
-      notifyListeners();
-    });
+          case AnimationStatus.dismissed:
+            state = MenuState.closed;
+            break;
+        }
+        notifyListeners();
+      });
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
-  // 0 and 1 
-  get percentOpen{
+  // 0 and 1
+  get percentOpen {
     return _animationController.value;
   }
 
   open() {
-   _animationController.forward();
+    _animationController.forward();
   }
 
   close() {
-   _animationController.reverse();
+    _animationController.reverse();
   }
 
   toggle() {
     if (state == MenuState.open) {
       close();
-    } else if(state == MenuState.closed){
+    } else if (state == MenuState.closed) {
       open();
     }
   }

@@ -1,8 +1,8 @@
 import 'package:my_holiday/screen.dart';
 import 'package:flutter/material.dart';
-import 'package:my_holiday/main.dart';
 
 class MenuScreen extends StatefulWidget{
+
 
   @override
   _MenuScreen createState() => new _MenuScreen();
@@ -26,7 +26,7 @@ class _MenuScreen extends State<MenuScreen>{
             color: Colors.transparent,
             child: new Stack(
               children: [
-                createMenuTitle(),
+                createMenuTitle(menuController),
                 createMenuItems(menuController)
               ],
             ),
@@ -50,7 +50,14 @@ class _MenuScreen extends State<MenuScreen>{
     ) ;
   }
 
-  createMenuTitle() {
+  createMenuTitle(MenuController menuController) {
+
+   /* switch(menuController.state){
+      case MenuState.open:
+      case MenuState.opening:
+
+    }*/
+
     return new Transform(
       transform: new Matrix4.translationValues(-100.0, 0.0, 0.0),
       child: new OverflowBox(
