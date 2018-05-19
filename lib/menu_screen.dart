@@ -13,7 +13,7 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     titleAnimationController = new AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 250));
+        vsync: this, duration: const Duration(milliseconds: 450));
   }
 
   @override
@@ -48,32 +48,58 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
 
   createMenuItems(MenuController menuController) {
     return new Transform(
-      transform: new Matrix4.translationValues(0.0, 250.0, 0.0),
-      child: new Column(children: [
-        new _MenuListItems(
-            title: 'HOME',
-            isSelected: true,
-            onTap: () {
-              menuController.close();
-            }),
-        new _MenuListItems(
-            title: 'PROFILE',
-            isSelected: false,
-            onTap: () {
-              menuController.close();
-            }),
-        new _MenuListItems(
-            title: 'ABOUT',
-            isSelected: false,
-            onTap: () {
-              menuController.close();
-            }),
-        new _MenuListItems(
-            title: 'SETTING',
-            isSelected: false,
-            onTap: () {
-              menuController.close();
-            }),
+      transform: new Matrix4.translationValues(0.0, 225.0, 0.0),
+      child: Column(
+          children: [
+            new AnimatedMenuListItem(
+              menuState: menuController.state,
+              duration: const Duration(milliseconds: 600),
+              curve: new Interval(0.0, 0.55, curve: Curves.easeOut),
+              menuListItems: new _MenuListItems(
+                  title: 'HOME',
+                  isSelected: true,
+                  onTap: () {
+                    menuController.close();
+                  }),
+            ),
+
+            new AnimatedMenuListItem(
+              menuState: menuController.state,
+              duration: const Duration(milliseconds: 600),
+              curve: new Interval(0.1, 0.65, curve: Curves.easeOut),
+              menuListItems: new _MenuListItems(
+                  title: 'PROFILE',
+                  isSelected: false,
+                  onTap: () {
+                    menuController.close();
+                  }),
+            ),
+
+            new AnimatedMenuListItem(
+              menuState: menuController.state,
+              duration: const Duration(milliseconds: 600),
+              curve: new Interval(0.2, 0.75, curve: Curves.easeOut),
+              menuListItems: new _MenuListItems(
+                  title: 'ABOUT',
+                  isSelected: false,
+                  onTap: () {
+                    menuController.close();
+                  }),
+            ),
+
+            new AnimatedMenuListItem(
+              menuState: menuController.state,
+              duration: const Duration(milliseconds: 600),
+              curve: new Interval(0.3, 0.85, curve: Curves.easeOut),
+              menuListItems:   new _MenuListItems(
+                  title: 'SETTING',
+                  isSelected: false,
+                  onTap: () {
+                    menuController.close();
+                  }),
+            ),
+
+
       ]),
     );
   }
@@ -182,8 +208,6 @@ class _AnimatedMenuListItemState extends AnimatedWidgetBaseState<AnimatedMenuLis
     
     );
   }
-
-
 }
 
 
