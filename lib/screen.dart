@@ -113,23 +113,58 @@ class _ScreenScaffoldState extends State<ScreenScaffold>
   }
 }
 
-class ScreenScaffoldMenuController extends StatelessWidget {
+class ScreenScaffoldMenuController extends StatefulWidget {
   final ScreenScaffoldBuilder builder;
 
   ScreenScaffoldMenuController({this.builder});
 
   @override
-  Widget build(BuildContext context) {
-    return builder(context, getMenuController(context));
+  ScreenScaffoldMenuControllerState createState() {
+    return new ScreenScaffoldMenuControllerState();
+  }
+}
+
+class ScreenScaffoldMenuControllerState extends State<ScreenScaffoldMenuController> {
+
+  MenuController menuController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    menuController = getMenuController(context);
+    menuController.addListener(_onMenuControllerChange);
+
   }
 
-  MenuController getMenuController(BuildContext context) {
+  @override
+  void dispose() {
+    menuController.removeListener(_onMenuControllerChange);
+    super.dispose();
+  }
+
+  getMenuController(BuildContext context) {
     final ScreenScaffold =
-        context.ancestorStateOfType(new TypeMatcher<_ScreenScaffoldState>())
-            as _ScreenScaffoldState;
+    context.ancestorStateOfType(new TypeMatcher<_ScreenScaffoldState>())
+    as _ScreenScaffoldState;
 
     return ScreenScaffold.menuController;
   }
+
+  _onMenuControllerChange(){
+    setState(() {
+
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, getMenuController(context));
+  }
+
+
+
+
 }
 
 typedef ScreenScaffoldBuilder(

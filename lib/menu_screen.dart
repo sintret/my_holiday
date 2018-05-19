@@ -114,6 +114,79 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
   }
 }
 
+class AnimatedMenuListItem extends ImplicitlyAnimatedWidget {
+
+  final _MenuListItems menuListItems;
+  final MenuState menuState;
+  final Duration duration;
+
+  AnimatedMenuListItem({
+    this.menuListItems,
+    this.menuState,
+    this.duration,
+    curve,
+  }): super(duration:duration, curve:curve) ;
+
+  @override
+  _AnimatedMenuListItemState createState() => new _AnimatedMenuListItemState();
+}
+
+class _AnimatedMenuListItemState extends AnimatedWidgetBaseState<AnimatedMenuListItem> {
+
+  final double closedSlidePosition = 250.0;
+  final double openSlidePosition = 0.0;
+
+  Tween<double> _transalation;
+  Tween<double> _opacity;
+
+  @override
+  void forEachTween(TweenVisitor<dynamic> visitor) {
+    var slide,opacity;
+
+    switch(widget.menuState){
+      case MenuState.closing:
+      case MenuState.closed:
+        slide = closedSlidePosition;
+        opacity = 0.0;
+        break;
+
+      case MenuState.open:
+      case MenuState.opening:
+        slide = openSlidePosition;
+        opacity = 1.0;
+        break;
+    }
+
+    _transalation = visitor(
+      _transalation,
+      slide,
+    (dynamic value) => new Tween<double>(begin: value)
+    );
+
+    _opacity = visitor(
+      _opacity,
+      opacity,
+    (dynamic value) => new Tween<double>(begin: value)
+    );
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Opacity(
+        opacity: _opacity.evaluate(animation),
+        child: new Transform(
+          transform: new Matrix4.translationValues(0.0, _transalation.evaluate(animation), 0.0),
+          child: widget.menuListItems,
+      ),
+    
+    );
+  }
+
+
+}
+
+
 class _MenuListItems extends StatelessWidget {
   final String title;
   final bool isSelected;
