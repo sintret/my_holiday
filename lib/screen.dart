@@ -134,7 +134,6 @@ class ScreenScaffoldMenuControllerState extends State<ScreenScaffoldMenuControll
 
     menuController = getMenuController(context);
     menuController.addListener(_onMenuControllerChange);
-
   }
 
   @override
@@ -161,11 +160,8 @@ class ScreenScaffoldMenuControllerState extends State<ScreenScaffoldMenuControll
   Widget build(BuildContext context) {
     return widget.builder(context, getMenuController(context));
   }
-
-
-
-
 }
+
 
 typedef ScreenScaffoldBuilder(
     BuildContext context, MenuController menuController);

@@ -2,11 +2,21 @@ import 'package:my_holiday/screen.dart';
 import 'package:flutter/material.dart';
 
 class MenuScreen extends StatefulWidget {
+
+  final Menu menu;
+  final Function(String) onMenuItemSelected;
+
+  MenuScreen({
+    this.menu,
+    this.onMenuItemSelected,
+  });
+
   @override
   _MenuScreen createState() => new _MenuScreen();
 }
 
 class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
+
   AnimationController titleAnimationController;
 
   @override
@@ -24,6 +34,7 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+
     return new ScreenScaffoldMenuController(
         builder: (BuildContext context, MenuController menuController) {
       return new Container(
@@ -47,60 +58,34 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
   }
 
   createMenuItems(MenuController menuController) {
+
+    //final titles = ['HOME', 'PLANETS', 'PROFILE', 'SETTINGS','LOGOUT'];
+    final selectedIndex = 0;
+    final List<Widget> listItems = [];
+    final animationIntervalDuration = 0.5;
+    final perListItemDelay = menuController.state != MenuState.closing ? 0.125 : 0.0;
+
+    for (var i = 0; i < widget.menu.items.length; i++) {
+      final animationIntervalStart = i * perListItemDelay;
+      final animationIntervalEnd = animationIntervalStart + animationIntervalDuration;
+
+      listItems.add(new AnimatedMenuListItem(
+        menuState: menuController.state,
+        duration: const Duration(milliseconds: 600),
+        curve: new Interval(animationIntervalStart, animationIntervalEnd, curve: Curves.easeOut),
+        menuListItems: new _MenuListItems(
+            title: widget.menu.items[i].title,
+            isSelected: selectedIndex == i ? true : false,
+            onTap: () {
+              widget.onMenuItemSelected(widget.menu.items[i].id);
+              menuController.close();
+            }),
+      ));
+    }
+
     return new Transform(
       transform: new Matrix4.translationValues(0.0, 225.0, 0.0),
-      child: Column(
-          children: [
-            new AnimatedMenuListItem(
-              menuState: menuController.state,
-              duration: const Duration(milliseconds: 600),
-              curve: new Interval(0.0, 0.55, curve: Curves.easeOut),
-              menuListItems: new _MenuListItems(
-                  title: 'HOME',
-                  isSelected: true,
-                  onTap: () {
-                    menuController.close();
-                  }),
-            ),
-
-            new AnimatedMenuListItem(
-              menuState: menuController.state,
-              duration: const Duration(milliseconds: 600),
-              curve: new Interval(0.1, 0.65, curve: Curves.easeOut),
-              menuListItems: new _MenuListItems(
-                  title: 'PROFILE',
-                  isSelected: false,
-                  onTap: () {
-                    menuController.close();
-                  }),
-            ),
-
-            new AnimatedMenuListItem(
-              menuState: menuController.state,
-              duration: const Duration(milliseconds: 600),
-              curve: new Interval(0.2, 0.75, curve: Curves.easeOut),
-              menuListItems: new _MenuListItems(
-                  title: 'ABOUT',
-                  isSelected: false,
-                  onTap: () {
-                    menuController.close();
-                  }),
-            ),
-
-            new AnimatedMenuListItem(
-              menuState: menuController.state,
-              duration: const Duration(milliseconds: 600),
-              curve: new Interval(0.3, 0.85, curve: Curves.easeOut),
-              menuListItems:   new _MenuListItems(
-                  title: 'SETTING',
-                  isSelected: false,
-                  onTap: () {
-                    menuController.close();
-                  }),
-            ),
-
-
-      ]),
+      child: Column(children: listItems),
     );
   }
 
@@ -125,23 +110,25 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
             padding: const EdgeInsets.all(30.0),
             child: new Text(
               'Menu',
-              style:
-              new TextStyle(fontSize: 230.0, color: const Color(0x88444444)),
+              style: new TextStyle(
+                  fontSize: 230.0, color: const Color(0x88444444)),
               softWrap: false,
               textAlign: TextAlign.left,
             ),
           ),
         ),
-        builder: (BuildContext context, Widget child){
-          return new Transform(transform: new Matrix4.translationValues(250.0 * (1.0 - titleAnimationController.value) - 100.0, 0.0, 0.0), child: child);
-        }
-    );
-
+        builder: (BuildContext context, Widget child) {
+          return new Transform(
+              transform: new Matrix4.translationValues(
+                  250.0 * (1.0 - titleAnimationController.value) - 100.0,
+                  0.0,
+                  0.0),
+              child: child);
+        });
   }
 }
 
 class AnimatedMenuListItem extends ImplicitlyAnimatedWidget {
-
   final _MenuListItems menuListItems;
   final MenuState menuState;
   final Duration duration;
@@ -151,14 +138,14 @@ class AnimatedMenuListItem extends ImplicitlyAnimatedWidget {
     this.menuState,
     this.duration,
     curve,
-  }): super(duration:duration, curve:curve) ;
+  }) : super(duration: duration, curve: curve);
 
   @override
   _AnimatedMenuListItemState createState() => new _AnimatedMenuListItemState();
 }
 
-class _AnimatedMenuListItemState extends AnimatedWidgetBaseState<AnimatedMenuListItem> {
-
+class _AnimatedMenuListItemState
+    extends AnimatedWidgetBaseState<AnimatedMenuListItem> {
   final double closedSlidePosition = 250.0;
   final double openSlidePosition = 0.0;
 
@@ -167,9 +154,9 @@ class _AnimatedMenuListItemState extends AnimatedWidgetBaseState<AnimatedMenuLis
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    var slide,opacity;
+    var slide, opacity;
 
-    switch(widget.menuState){
+    switch (widget.menuState) {
       case MenuState.closing:
       case MenuState.closed:
         slide = closedSlidePosition;
@@ -183,33 +170,25 @@ class _AnimatedMenuListItemState extends AnimatedWidgetBaseState<AnimatedMenuLis
         break;
     }
 
-    _transalation = visitor(
-      _transalation,
-      slide,
-    (dynamic value) => new Tween<double>(begin: value)
-    );
+    _transalation = visitor(_transalation, slide,
+        (dynamic value) => new Tween<double>(begin: value));
 
     _opacity = visitor(
-      _opacity,
-      opacity,
-    (dynamic value) => new Tween<double>(begin: value)
-    );
-
+        _opacity, opacity, (dynamic value) => new Tween<double>(begin: value));
   }
 
   @override
   Widget build(BuildContext context) {
     return new Opacity(
-        opacity: _opacity.evaluate(animation),
-        child: new Transform(
-          transform: new Matrix4.translationValues(0.0, _transalation.evaluate(animation), 0.0),
-          child: widget.menuListItems,
+      opacity: _opacity.evaluate(animation),
+      child: new Transform(
+        transform: new Matrix4.translationValues(
+            0.0, _transalation.evaluate(animation), 0.0),
+        child: widget.menuListItems,
       ),
-    
     );
   }
 }
-
 
 class _MenuListItems extends StatelessWidget {
   final String title;
@@ -238,4 +217,24 @@ class _MenuListItems extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class Menu {
+  final List<MenuItem> items;
+
+  Menu({
+    this.items
+  });
+}
+
+class MenuItem{
+  final String id;
+  final String title;
+
+  MenuItem({
+    this.id,
+    this.title
+  });
+
 }

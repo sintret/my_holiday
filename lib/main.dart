@@ -27,11 +27,31 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final Menu menu = new Menu(items: [
+    MenuItem(id: 'menu1', title: 'HOME'),
+    MenuItem(id: 'menu2', title: 'PLANETS'),
+    MenuItem(id: 'menu3', title: 'PROFILE'),
+    MenuItem(id: 'menu4', title: 'SETTINGS'),
+    MenuItem(id: 'menu5', title: 'LOGOUT'),
+  ]);
+
   var activeState = natureScreen;
 
   @override
   Widget build(BuildContext context) {
-    return new ScreenScaffold(menuScreen: new MenuScreen(),contentScreen: activeState);
+    return new ScreenScaffold(
+        menuScreen: new MenuScreen(
+          menu: menu,
+          onMenuItemSelected: (String itemId) {
+            //print('Menu Item Selected: $itemId');
+            if(itemId == 'menu1'){
+              setState(() => activeState = natureScreen);
+            } else {
+
+            }
+          },
+        ),
+        contentScreen: activeState
+    );
   }
 }
-
