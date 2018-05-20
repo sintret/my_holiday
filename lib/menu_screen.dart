@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class MenuScreen extends StatefulWidget {
 
   final Menu menu;
+  var selectedItemId;
   final Function(String) onMenuItemSelected;
 
   MenuScreen({
     this.menu,
+    this.selectedItemId,
     this.onMenuItemSelected,
   });
 
@@ -60,7 +62,7 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
   createMenuItems(MenuController menuController) {
 
     //final titles = ['HOME', 'PLANETS', 'PROFILE', 'SETTINGS','LOGOUT'];
-    final selectedIndex = 0;
+    //final selectedIndex = 0;
     final List<Widget> listItems = [];
     final animationIntervalDuration = 0.5;
     final perListItemDelay = menuController.state != MenuState.closing ? 0.125 : 0.0;
@@ -75,7 +77,7 @@ class _MenuScreen extends State<MenuScreen> with TickerProviderStateMixin {
         curve: new Interval(animationIntervalStart, animationIntervalEnd, curve: Curves.easeOut),
         menuListItems: new _MenuListItems(
             title: widget.menu.items[i].title,
-            isSelected: selectedIndex == i ? true : false,
+            isSelected: widget.selectedItemId == widget.menu.items[i].id ? true : false,
             onTap: () {
               widget.onMenuItemSelected(widget.menu.items[i].id);
               menuController.close();

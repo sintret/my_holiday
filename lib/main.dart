@@ -35,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
     MenuItem(id: 'menu5', title: 'LOGOUT'),
   ]);
 
+  var selectedMenuItemId = 'menu1';
   var activeState = natureScreen;
 
   @override
@@ -42,12 +43,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return new ScreenScaffold(
         menuScreen: new MenuScreen(
           menu: menu,
+          selectedItemId: selectedMenuItemId,
           onMenuItemSelected: (String itemId) {
+            selectedMenuItemId = itemId;
             //print('Menu Item Selected: $itemId');
             if(itemId == 'menu1'){
               setState(() => activeState = natureScreen);
             } else {
-
+              setState(() => activeState = planetScreen);
             }
           },
         ),
