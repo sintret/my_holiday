@@ -60,6 +60,25 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
     return new ScreenScaffoldMenuController(
         builder: (BuildContext context, MenuController menuController) {
+
+          var shouldRenderSelector = true;
+          var actualSelectorYTop = selectorYTop;
+          var actualSelectorYBottom = selectorYBottom;
+          var selectorOpacity = 1.0;
+
+          if(menuController.state == MenuState.closed || menuController.state == MenuState.closing || selectorYTop ==null){
+            final RenderBox menuScreenRenderBox = context.findRenderObject() as RenderBox;
+
+            if(menuScreenRenderBox != null){
+              final menuScreenHeight = menuScreenRenderBox.size.height;
+              actualSelectorYTop = menuScreenHeight -50.0;
+              actualSelectorYBottom = menuScreenHeight;
+              selectorOpacity = 0.0;
+            } else {
+              shouldRenderSelector = false;
+            }
+
+          }
       return new Container(
         width: double.infinity,
         height: double.infinity,
@@ -73,12 +92,12 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
             children: [
               createMenuTitle(menuController),
               createMenuItems(menuController),
+              shouldRenderSelector ?
               new ItemSelector(
-                topY: selectorYTop,
-                bottomY: selectorYBottom,
-                opacity: 1.0,
-
-              )
+                topY: actualSelectorYTop,
+                bottomY: actualSelectorYBottom,
+                opacity: selectorOpacity,
+              ) : new Container()
             ],
           ),
         ),
