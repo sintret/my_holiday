@@ -23,12 +23,20 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
 
   AnimationController titleAnimationController;
   RenderBox _selectedRenderBox;
+  double selectorYTop = 250.0;
+  double selectorYBottom = 300.0;
 
-  setSelectedRenderBox(newRenderBox) async {
-    setState(() {
-      _selectedRenderBox = newRenderBox;
+  setSelectedRenderBox(RenderBox newRenderBox) async {
+    final newYTop = newRenderBox.localToGlobal(const Offset(0.0,0.0)).dy;
+    final newYBottom = newYTop + newRenderBox.size.height;
 
-    });
+    if(newYTop != selectorYTop){
+      setState(() {
+        //_selectedRenderBox = newRenderBox;
+        selectorYTop = newYTop;
+        selectorYBottom = newYBottom;
+      });
+    }
   }
 
   @override
@@ -47,11 +55,8 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
 
-    if(_selectedRenderBox == null){
-      print('selected render box is null');
-    } else {
-      print('selected render box y position is ${_selectedRenderBox.localToGlobal(const Offset(0.0, 0.0))}');
-    }
+    print('selected render box y position is ${selectorYTop}');
+
 
     return new ScreenScaffoldMenuController(
         builder: (BuildContext context, MenuController menuController) {
@@ -67,7 +72,13 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
           child: new Stack(
             children: [
               createMenuTitle(menuController),
-              createMenuItems(menuController)
+              createMenuItems(menuController),
+              new ItemSelector(
+                topY: selectorYTop,
+                bottomY: selectorYBottom,
+                opacity: 1.0,
+
+              )
             ],
           ),
         ),
@@ -147,6 +158,71 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
         });
   }
 }
+
+
+class ItemSelector extends ImplicitlyAnimatedWidget {
+
+  final double topY;
+  final double bottomY;
+  final double opacity;
+
+  ItemSelector({
+    this.topY,
+    this.bottomY,
+    this.opacity,
+  }) : super(duration: const Duration(milliseconds: 250));
+
+
+  @override
+  _ItemSelectorState createState() => new _ItemSelectorState();
+}
+
+class _ItemSelectorState extends AnimatedWidgetBaseState<ItemSelector> {
+
+  Tween<double> _topY;
+  Tween<double> _bottomY;
+  Tween<double> _opacity;
+
+  @override
+  void forEachTween(TweenVisitor<dynamic> visitor) {
+
+    _topY = visitor(
+      _topY,
+      widget.topY,
+    (dynamic value) => new Tween<double>(begin: value)
+    );
+
+    _bottomY = visitor(
+        _bottomY,
+        widget.bottomY,
+            (dynamic value) => new Tween<double>(begin: value)
+    );
+
+    _opacity = visitor(
+        _opacity,
+        widget.opacity,
+            (dynamic value) => new Tween<double>(begin: value)
+    );
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Positioned(
+      top: _topY.evaluate(animation),
+      child: new Opacity(
+        opacity: _opacity.evaluate(animation),
+        child: new Container(
+          width: 5.0,
+          height: 50.4,
+          color: Colors.red,
+        ),
+      ),
+    );
+  }
+
+}
+
 
 class AnimatedMenuListItem extends ImplicitlyAnimatedWidget {
   final _MenuListItems menuListItems;
