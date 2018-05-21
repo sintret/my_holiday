@@ -25,12 +25,10 @@ class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
   RenderBox _selectedRenderBox;
 
   setSelectedRenderBox(newRenderBox) async {
-
     setState(() {
       _selectedRenderBox = newRenderBox;
 
     });
-
   }
 
   @override

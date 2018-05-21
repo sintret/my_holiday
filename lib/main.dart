@@ -27,6 +27,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   final Menu menu = new Menu(items: [
     MenuItem(id: 'menu1', title: 'HOME'),
     MenuItem(id: 'menu2', title: 'PLANETS'),
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return new ScreenScaffold(
         menuScreen: new MenuScreen(
           menu: menu,
